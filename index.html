@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/sli35/nextui/main/css/next.css"/>
+    <script src="https://raw.githubusercontent.com/sli35/nextui/main/js/next.js"/>
+    <script>
+      var topologyData = {
+        nodes: [
+          {"id":0, "name": "R1"},
+          {"id":1, "name": "R2"}
+        ],
+        links: [
+          {"source": 0, "target": 1}
+        ],
+        nodeSet: [
+          {"id": 10, "nodes": [0, 1]}
+        ]
+      };
+
+      (function(nx) {
+        var app = new nx.ui.Application();
+        console.log(app);
+        var topoConfig = {
+          "nodeConfig": {
+            "label":"model.id",
+            "iconType": "router"
+          },
+          "linkConfig": {
+            "linkType": "curve"
+          },
+          "showIcon": true,
+          "dataProcessor": "force"
+        };
+
+        var topo = new nx.graphic.Topology(topoConfig);
+
+        topo.data(topologyData);
+        console.log(topo);
+        topo.attach(app);
+        app.container(document.getElementByID("topo-container"));
+      })(nx);
+
+
+    </script>
+  </head>
+  <body>
+    <div id="topo-container"></div>
+
+  </body>
+</html>
