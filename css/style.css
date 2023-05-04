@@ -1,0 +1,114 @@
+
+.header {
+  position: fixed;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+  top:0;
+  left: 0;
+  height: 60px;
+  width: 100% !important;
+  background-color:#009EDC; 
+  color: white;
+  width: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+.header__title {
+  top: 0;
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+.header__data {
+  position: relative;
+  top: 0;
+  grid-area: 1 / 2 / 2 / 3;
+  font-size: 20px;
+}
+
+.header__search {
+  position: relative;
+  top: 20px;
+  grid-area: 1 / 3 / 2 / 4;
+  font-size: 30px;
+}
+
+.table-details {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.table-details th {
+  background-color: #009EDC;
+  color: #ffffff;
+  text-align: center;
+}
+
+.table-details td {
+  text-align: center;
+}
+
+.table-details tr:nth-of-type(even) td {
+  background-color: #f3f3f3;
+  text-align: center;
+}
+
+.menu {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 75px;
+  height: 100%;
+  background: #009EDC;
+  font-size: 16px;
+}
+.main {
+  position: fixed;
+  display: grid;
+  grid-template-columns: 2.5fr 1.5fr;
+  grid-template-rows: 1fr 1fr;
+  top: 60px;
+  left: 75px;
+  height: 100%;
+  width: 100%;
+  background-color: white;
+}
+
+.topology {
+  top: 0;
+  grid-area: 1 / 1 / 3 / 2;
+}
+
+.toolbox {
+  top: 0;
+  grid-area: 1 / 2 / 2 / 3;
+}
+
+.tool {
+  display: none;
+}
+
+.details {
+  grid-area: 2 / 2 / 3 / 3;
+  display: none;
+}
+
+.menu__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+  text-decoration: none;
+  color: #666666;
+  transition: background 0.3s;
+}
+.menu__item > i {
+  font-size: 2.2em;
+}

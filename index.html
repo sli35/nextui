@@ -1,8 +1,103 @@
 <html>
   <head>
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/sli35/nextui/main/css/next.css"/>
-    <script src="https://raw.githubusercontent.com/sli35/nextui/main/js/next.js"/>
+    <link rel="stylesheet" href="css/next.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script type="text/javascript"  src="./js/ui_topology.js"></script>
+    <script type="text/javascript"  src="./js/cloudgen_decoder.js"></script>
+    <script type="text/javascript"  src="./js/search.js"></script>
+    <script type="text/javascript"  src="js/next.js"></script>
+    <script type="text/javascript"  src="./js/app.js"></script>
+
     <script>
+      console.log("START");
+    </script>
+
+  </head>
+  <body>
+    <div id="angular-element" ng-app="myApp" ng-controller="myCtrl">
+      <div id="menu">
+        <nav class="menu">
+          <a class="menu__item" data-tooltip="Home" onclick="hide_all();">
+            <i class="material-icons">home</i>  
+          </a>
+          <a class="menu__item" data-tooltip="Open file" onclick="show_window('openFile');">
+            <i class="material-icons">file_open</i>  
+          </a>
+          <a class="menu__item" data-tooltip="Compute" onclick="show_window('computePath');">
+            <i class="material-icons">merge</i>  
+          </a>
+        </nav>
+      </div>
+      <div id="header" class="header">
+        <div class="header__title">Cloudgen topology visualizer</div>
+        <div class="header__data">{{ ui_topo_name }}</div>
+        <div class="header__search">
+          <input type="text" id="global_search" placeholder="IP Address Search"/>
+        </div>
+      </div>
+      
+      <div id="main" class="main">
+        <div id="topocontainer" class="topology"></div>  
+        <div id="toolbox" class="toolbox">
+          <div id="openFile" class="tool">
+            <h1>Load file</h1>
+            <ul><input type="file" id="file-selector" accept=".dat" onchange="load_topology(this);"/></ul>
+          </div>
+          <div id="computePath" class="tool">
+            <h1>Compute path</h1>
+            <ul>Source <input type="text" id="source"/></ul>
+            <ul>Destination <input type="text" id="destination"/></ul>
+            <ul><button>Compute</button></ul>
+            <div id="computedPaths" class="pathList">
+            </div>
+          </div>
+        </div>
+        <div id="link-detail" class="details">
+          <h1>Link details</h1>
+          <table class="table-details">
+            <tr><th>Local IPv4</th><td>{{ ui_link.unidir_link_delay }}</td></tr>
+            <tr><th>Remote IPv4</th><td></td></tr>
+            <tr><th>IGP metric</th><td>{{ ui_link.igp_metric }}</td></tr>
+            <tr><th>TE metric</th><td>{{ ui_link.te_metric }}</td></tr>
+            <tr><th>Latency metric</th><td>{{ ui_link.unidir_link_delay }}</td></tr>
+            <tr><th>Min Latency metric</th><td>{{ ui_link.unidir_min_link_delay }}</td></tr>
+            <tr><th>Max Latency metric</th><td>{{ ui_link.unidir_max_link_delay }}</td>
+            <tr><th>Admin groups</th><td>{{ ui_link.admin_groups }}</td></tr>
+            <tr><th>SRLGs</th><td>{{ ui_link.srlgs }}</td></tr>
+            <tr><th>MSDs</th><td>{{ ui_link.msd }}</td></tr>
+          </table>
+        </div>
+        <div id="node-detail" class="details">
+          <h1>Node details</h1>
+          <div ng-repeat="(key, value) in ui_node.ls_nodes">LS Node {{ key }}
+            <table class="table-details">
+              <tr><th>Domain ID</th><td>{{ value.domain_id }}</td></tr>
+              <tr><th>OSPF area ID</th><td>{{ value.nodeID.ospf_area_id }}</td></tr>
+              <tr><th>ASN</th><td>{{ value.nodeID.asn }}</td></tr>
+              <tr><th>Protocol ID</th><td>{{ value.nodeID.proto_id }}</td></tr>
+              <tr><th>Name</th><td>{{ value.name }}</td></tr>
+              <tr><th>IPv4 RID</th><td>{{ value.ipv4_id }}</td></tr>
+              <tr><th>SR-Algos</th><td>{{ value.sr_algos }}</td></tr>
+              <tr><th>SRGBs</th><td>{{ value.srgbs}}</td></tr>
+              <tr><th>SRLBs</th><td>{{ value.srlbs}}</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      var app = angular.module('myApp', []);
+      app.controller('myCtrl', function ($scope) {
+        $scope.ui_link = undefined;
+        $scope.ui_node = undefined;
+        $scope.ui_topo_name = undefined;
+      });
+
+      hide_all();
       var topologyData = {
         nodes: [
           {"id":0, "name": "R1"},
@@ -16,34 +111,20 @@
         ]
       };
 
-      (function(nx) {
-        var app = new nx.ui.Application();
-        console.log(app);
-        var topoConfig = {
-          "nodeConfig": {
-            "label":"model.id",
-            "iconType": "router"
-          },
-          "linkConfig": {
-            "linkType": "curve"
-          },
-          "showIcon": true,
-          "dataProcessor": "force"
-        };
+      // Get the input field
+      var input = document.getElementById("global_search");
 
-        var topo = new nx.graphic.Topology(topoConfig);
+      // Execute a function when the user presses a key on the keyboard
+      input.addEventListener("keypress", function(event) {
+        // If the user presses the "Enter" key on the keyboard
+        if (event.key === "Enter") {
+          event.preventDefault();
+          search_ip();
+        }
+      });
 
-        topo.data(topologyData);
-        console.log(topo);
-        topo.attach(app);
-        app.container(document.getElementByID("topo-container"));
-      })(nx);
-
+      topology_ui_init(topologyData);
 
     </script>
-  </head>
-  <body>
-    <div id="topo-container"></div>
-
   </body>
 </html>
